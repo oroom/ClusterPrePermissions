@@ -128,6 +128,7 @@ typedef void (^ClusterPrePermissionCompletionHandler)(BOOL hasPermission,
 + (ClusterAuthorizationStatus) pushNotificationPermissionAuthorizationStatus;
 
 - (void) showAVPermissionsWithType:(ClusterAVAuthorizationType)mediaType
+                    showPremessage:(BOOL)showPremessage
                              title:(NSString *)requestTitle
                            message:(NSString *)message
                    denyButtonTitle:(NSString *)denyButtonTitle
@@ -135,24 +136,28 @@ typedef void (^ClusterPrePermissionCompletionHandler)(BOOL hasPermission,
                 completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
 
 - (void) showCameraPermissionsWithTitle:(NSString *)requestTitle
+                         showPremessage:(BOOL)showPremessage
                                 message:(NSString *)message
                         denyButtonTitle:(NSString *)denyButtonTitle
                        grantButtonTitle:(NSString *)grantButtonTitle
                       completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
 
 - (void) showMicrophonePermissionsWithTitle:(NSString *)requestTitle
+                             showPremessage:(BOOL)showPremessage
                                     message:(NSString *)message
                             denyButtonTitle:(NSString *)denyButtonTitle
                            grantButtonTitle:(NSString *)grantButtonTitle
                           completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
 
 - (void) showPhotoPermissionsWithTitle:(NSString *)requestTitle
+                        showPremessage:(BOOL)showPremessage
                                message:(NSString *)message
                        denyButtonTitle:(NSString *)denyButtonTitle
                       grantButtonTitle:(NSString *)grantButtonTitle
                      completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
 
 - (void) showContactsPermissionsWithTitle:(NSString *)requestTitle
+                           showPremessage:(BOOL)showPremessage
                                   message:(NSString *)message
                           denyButtonTitle:(NSString *)denyButtonTitle
                          grantButtonTitle:(NSString *)grantButtonTitle
@@ -160,12 +165,14 @@ typedef void (^ClusterPrePermissionCompletionHandler)(BOOL hasPermission,
 
 - (void) showEventPermissionsWithType:(ClusterEventAuthorizationType)eventType
                                 Title:(NSString *)requestTitle
-                                  message:(NSString *)message
-                          denyButtonTitle:(NSString *)denyButtonTitle
-                         grantButtonTitle:(NSString *)grantButtonTitle
-                        completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
+                       showPremessage:(BOOL)showPremessage
+                              message:(NSString *)message
+                      denyButtonTitle:(NSString *)denyButtonTitle
+                     grantButtonTitle:(NSString *)grantButtonTitle
+                    completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler;
 
 - (void) showLocationPermissionsWithTitle:(NSString *)requestTitle
+                           showPremessage:(BOOL)showPremessage
                                   message:(NSString *)message
                           denyButtonTitle:(NSString *)denyButtonTitle
                          grantButtonTitle:(NSString *)grantButtonTitle
@@ -173,6 +180,7 @@ typedef void (^ClusterPrePermissionCompletionHandler)(BOOL hasPermission,
 
 - (void) showLocationPermissionsForAuthorizationType:(ClusterLocationAuthorizationType)authorizationType
                                                title:(NSString *)requestTitle
+                                      showPremessage:(BOOL)showPremessage
                                              message:(NSString *)message
                                      denyButtonTitle:(NSString *)denyButtonTitle
                                     grantButtonTitle:(NSString *)grantButtonTitle
@@ -180,6 +188,7 @@ typedef void (^ClusterPrePermissionCompletionHandler)(BOOL hasPermission,
 
 - (void) showPushNotificationPermissionsWithType:(ClusterPushNotificationType)requestedType
                                            title:(NSString *)requestTitle
+                                  showPremessage:(BOOL)showPremessage
                                          message:(NSString *)message
                                  denyButtonTitle:(NSString *)denyButtonTitle
                                 grantButtonTitle:(NSString *)grantButtonTitle
