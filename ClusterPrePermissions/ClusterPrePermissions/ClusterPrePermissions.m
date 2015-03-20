@@ -786,7 +786,7 @@ static ClusterPrePermissions *__sharedInstance;
         
     } else {
         if (completionHandler) {
-            completionHandler((status == ClusterAuthorizationStatusUnDetermined),
+            completionHandler((status == ClusterAuthorizationStatusAuthorized),
                               ClusterDialogResultNoActionTaken,
                               ClusterDialogResultNoActionTaken);
         }
