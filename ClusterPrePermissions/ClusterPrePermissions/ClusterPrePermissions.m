@@ -135,7 +135,7 @@ static ClusterPrePermissions *__sharedInstance;
                 return ClusterAuthorizationStatusAuthorized;
             }
             else {
-                    return ClusterAuthorizationStatusDenied;
+                return ClusterAuthorizationStatusDenied;
             }
         }
         else {
@@ -146,7 +146,7 @@ static ClusterPrePermissions *__sharedInstance;
                 return ClusterAuthorizationStatusAuthorized;
             }
         }
-
+        
     } else {
         return ClusterAuthorizationStatusUnDetermined;
     }
@@ -236,21 +236,32 @@ static ClusterPrePermissions *__sharedInstance;
                   grantButtonTitle:(NSString *)grantButtonTitle
                  completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler
 {
+    AVAuthorizationStatus status = AVAuthorizationStatusNotDetermined;
     if (requestTitle.length == 0) {
         switch (mediaType) {
             case ClusterAVAuthorizationTypeCamera:
+                status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
                 requestTitle = @"Access Camera?";
                 break;
-            
+                
             default:
+                status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
                 requestTitle = @"Access Microphone?";
                 break;
         }
     }
+    switch (mediaType) {
+        case ClusterAVAuthorizationTypeCamera:
+            status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+            break;
+            
+        default:
+            status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+            break;
+    }
     denyButtonTitle  = [self titleFor:ClusterTitleTypeDeny fromTitle:denyButtonTitle];
     grantButtonTitle = [self titleFor:ClusterTitleTypeRequest fromTitle:grantButtonTitle];
     
-    AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     if (status == AVAuthorizationStatusNotDetermined) {
         self.avPermissionCompletionHandler = completionHandler;
         
@@ -314,9 +325,9 @@ static ClusterPrePermissions *__sharedInstance;
 {
     [AVCaptureDevice requestAccessForMediaType:[self AVEquivalentMediaType:mediaType]
                              completionHandler:^(BOOL granted) {
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                        [self fireAVPermissionCompletionHandlerWithType:mediaType];
-                                    });
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                     [self fireAVPermissionCompletionHandlerWithType:mediaType];
+                                 });
                              }];
 }
 
@@ -341,8 +352,8 @@ static ClusterPrePermissions *__sharedInstance;
             systemDialogResult = ClusterDialogResultParentallyRestricted;
         }
         self.avPermissionCompletionHandler((status == AVAuthorizationStatusAuthorized),
-                                              userDialogResult,
-                                              systemDialogResult);
+                                           userDialogResult,
+                                           systemDialogResult);
         self.avPermissionCompletionHandler = nil;
     }
 }
@@ -602,8 +613,8 @@ static ClusterPrePermissions *__sharedInstance;
             systemDialogResult = ClusterDialogResultParentallyRestricted;
         }
         self.eventPermissionCompletionHandler((status == EKAuthorizationStatusAuthorized),
-                                                userDialogResult,
-                                                systemDialogResult);
+                                              userDialogResult,
+                                              systemDialogResult);
         self.eventPermissionCompletionHandler = nil;
     }
 }
@@ -745,71 +756,71 @@ static ClusterPrePermissions *__sharedInstance;
 - (void) showPushNotificationPermissionsWithType:(ClusterPushNotificationType)requestedType
                                            title:(NSString *)requestTitle
                                   showPremessage:(BOOL)showPremessage
-                                          message:(NSString *)message
-                                  denyButtonTitle:(NSString *)denyButtonTitle
-                                 grantButtonTitle:(NSString *)grantButtonTitle
-                                completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler
+                                         message:(NSString *)message
+                                 denyButtonTitle:(NSString *)denyButtonTitle
+                                grantButtonTitle:(NSString *)grantButtonTitle
+                               completionHandler:(ClusterPrePermissionCompletionHandler)completionHandler
 {
     if (requestTitle.length == 0) {
-            requestTitle = @"Enable Push Notifications?";
-        }
+        requestTitle = @"Enable Push Notifications?";
+    }
     denyButtonTitle  = [self titleFor:ClusterTitleTypeDeny fromTitle:denyButtonTitle];
     grantButtonTitle = [self titleFor:ClusterTitleTypeRequest fromTitle:grantButtonTitle];
-
+    
     ClusterAuthorizationStatus status = [ClusterPrePermissions pushNotificationPermissionAuthorizationStatus];
     if (status == ClusterAuthorizationStatusUnDetermined) {
-            self.pushNotificationPermissionCompletionHandler = completionHandler;
-            self.requestedPushNotificationTypes = requestedType;
+        self.pushNotificationPermissionCompletionHandler = completionHandler;
+        self.requestedPushNotificationTypes = requestedType;
         
-            if (showPremessage) {
-                self.prePushNotificationPermissionAlertView = [[UIAlertView alloc] initWithTitle:requestTitle
-                                                                                         message:message
-                                                                                        delegate:self
-                                                                               cancelButtonTitle:denyButtonTitle
-                                                                               otherButtonTitles:grantButtonTitle, nil];
-                [self.prePushNotificationPermissionAlertView show];
-            }
-            else {
-                [self showActualPushNotificationPermissionAlert];
-            }
+        if (showPremessage) {
+            self.prePushNotificationPermissionAlertView = [[UIAlertView alloc] initWithTitle:requestTitle
+                                                                                     message:message
+                                                                                    delegate:self
+                                                                           cancelButtonTitle:denyButtonTitle
+                                                                           otherButtonTitles:grantButtonTitle, nil];
+            [self.prePushNotificationPermissionAlertView show];
+        }
+        else {
+            [self showActualPushNotificationPermissionAlert];
+        }
         
-        } else {
-                if (completionHandler) {
-                        completionHandler((status == ClusterAuthorizationStatusUnDetermined),
-                                                                            ClusterDialogResultNoActionTaken,
-                                                                            ClusterDialogResultNoActionTaken);
-                    }
-            }
+    } else {
+        if (completionHandler) {
+            completionHandler((status == ClusterAuthorizationStatusUnDetermined),
+                              ClusterDialogResultNoActionTaken,
+                              ClusterDialogResultNoActionTaken);
+        }
+    }
 }
 
 
 - (void) showActualPushNotificationPermissionAlert
 {
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                                    selector:@selector(applicationDidBecomeActive)
-                                                        name:UIApplicationDidBecomeActiveNotification
-                                                        object:nil];
-
+                                             selector:@selector(applicationDidBecomeActive)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
-            // iOS8+
-            UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationType)self.requestedPushNotificationTypes
-                                                                                                                                        categories:nil];
-            [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        } else {
-                [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationType)self.requestedPushNotificationTypes];
-            }
-
+        // iOS8+
+        UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationType)self.requestedPushNotificationTypes
+                                                                                 categories:nil];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    } else {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationType)self.requestedPushNotificationTypes];
+    }
+    
     [[NSUserDefaults standardUserDefaults] setBool:YES
-                                                    forKey:ClusterPrePermissionsDidAskForPushNotifications];
+                                            forKey:ClusterPrePermissionsDidAskForPushNotifications];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (void)applicationDidBecomeActive
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                            name:UIApplicationDidBecomeActiveNotification
-                                                        object:nil];
+                                                    name:UIApplicationDidBecomeActiveNotification
+                                                  object:nil];
     [self firePushNotificationPermissionCompletionHandler];
 }
 
@@ -818,21 +829,21 @@ static ClusterPrePermissions *__sharedInstance;
 {
     ClusterAuthorizationStatus status = [ClusterPrePermissions pushNotificationPermissionAuthorizationStatus];
     if (self.pushNotificationPermissionCompletionHandler) {
-            ClusterDialogResult userDialogResult = ClusterDialogResultGranted;
-            ClusterDialogResult systemDialogResult = ClusterDialogResultGranted;
-            if (status == ClusterAuthorizationStatusAuthorized) {
-                    userDialogResult = ClusterDialogResultGranted;
-                    systemDialogResult = ClusterDialogResultGranted;
-                } else if (status == ClusterAuthorizationStatusDenied) {
-                        userDialogResult = ClusterDialogResultGranted;
-                        systemDialogResult = ClusterDialogResultDenied;
-                    } else if (status == ClusterAuthorizationStatusUnDetermined) {
-                            userDialogResult = ClusterDialogResultDenied;
-                            systemDialogResult = ClusterDialogResultNoActionTaken;
-                        }
-               self.pushNotificationPermissionCompletionHandler((status == ClusterAuthorizationStatusAuthorized), userDialogResult, systemDialogResult);
-            self.pushNotificationPermissionCompletionHandler = nil;
+        ClusterDialogResult userDialogResult = ClusterDialogResultGranted;
+        ClusterDialogResult systemDialogResult = ClusterDialogResultGranted;
+        if (status == ClusterAuthorizationStatusAuthorized) {
+            userDialogResult = ClusterDialogResultGranted;
+            systemDialogResult = ClusterDialogResultGranted;
+        } else if (status == ClusterAuthorizationStatusDenied) {
+            userDialogResult = ClusterDialogResultGranted;
+            systemDialogResult = ClusterDialogResultDenied;
+        } else if (status == ClusterAuthorizationStatusUnDetermined) {
+            userDialogResult = ClusterDialogResultDenied;
+            systemDialogResult = ClusterDialogResultNoActionTaken;
         }
+        self.pushNotificationPermissionCompletionHandler((status == ClusterAuthorizationStatusAuthorized), userDialogResult, systemDialogResult);
+        self.pushNotificationPermissionCompletionHandler = nil;
+    }
 }
 
 
