@@ -803,8 +803,19 @@ static ClusterPrePermissions *__sharedInstance;
     
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
         // iOS8+
+        // Register notifications for app extension
+        NSMutableSet *categories = [[NSMutableSet alloc] init];
+        
+        UIMutableUserNotificationAction *callAction = [[UIMutableUserNotificationAction alloc] init];
+        callAction.title = NSLocalizedString(@"Call", nil);
+        callAction.identifier = @"call";
+        callAction.activationMode = UIUserNotificationActivationModeForeground;
+        callAction.authenticationRequired = NO;
+        
+        [categories addObject:callAction];
+        
         UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationType)self.requestedPushNotificationTypes
-                                                                                 categories:nil];
+                                                                                 categories:categories];
         [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
     } else {
